@@ -1,0 +1,435 @@
+---
+title: "Google Capstone Project - Cyclistic"
+author: "Waqas"
+date: "2022-09-12"
+output:
+  word_document:
+    toc: yes
+  html_document:
+    toc: yes
+    theme: united
+---
+# Business Task
+
+The Cyclistic Company wants to increase its profitability, thus maximizing the number of annual customers can help them do so. So the company aims to convert most of the casual riders into annual suscribers.
+
+# Ask
+
+#### Guiding Questions
+
+**What is the problem that I am trying to solve?**
+
+I need to find out how casual members and annual subscribers of cyclists differ from each other and how these member use cyclistics bike differently.
+
+**How can your insights drive business decisions?**
+
+The insights can help me track the riding habits, and thus by analyzing these habits, we can introduce some new plans which can encourage the casual riders to opt for annual subscription.
+
+**Who are my stakeholders?**
+
+* Lily Moreno- Our marketting director and manager
+
+* Cyclistic marketting analytics team
+
+* Cyclistic executive team
+
+# Prepare
+
+#### Guiding Questions
+
+**Where is the data located?**
+
+It is historical dataset collected by cyclistic company itself
+
+**How is data organized? **
+
+Ther data collected is for 12 months, thus we will check for its organisation individually. But first we will load our data in R. And for performing our work,we need to download some pacakges
+
+```{r = loading tidyverse}
+library(tidyverse)
+```
+Tidyverse is  a system of package in R with common design philosophy for data manipulation, exploration and visualization.
+
+Now we will load the first data set in the variable **january** and view it
+
+```{r = reading dataset}
+january <- read_csv("2021_01_divvy_tripdata.csv")
+
+```
+
+To view the dataset we use
+
+```{r = viewing dataset}
+View(january)
+```
+For the organisation of this dataset we use
+
+```{r = viewing column names}
+colnames(january)
+```
+
+To view first six rows of this dataset
+
+```{r = first six rows of january}
+head(january)
+```
+
+Now we will load other datasets and see if the column names are same
+```{r = loading february dataset}
+february <- read_csv("2021_02_divvy_tripdata.csv")
+```
+
+```{r = viewing columns for february dataset}
+colnames(february)
+```
+**March dataset**
+
+```{r = loading march dataset}
+ march <- read_csv("2021_03_divvy_tripdata.csv")
+```
+
+```{r = viewing columns for march datasets}
+colnames(march)
+```
+
+**April dataset**
+
+```{r = loading april dataset}
+ april <- read_csv("2021_04_divvy_tripdata.csv")
+```
+
+```{r = viewing column name for april dataset}
+colnames(april)
+```
+
+**May dataset**
+
+```{r = loading may dataset}
+may <- read_csv("2021_05_divvy_tripdata.csv")
+```
+```{r = viewing column name for may dataset}
+colnames(may)
+```
+
+**June dataset**
+
+```{r = loading june dataset}
+june <- read_csv("2021_06_divvy_tripdata.csv")
+```
+
+```{r = viewing column name for june dataset}
+colnames(june)
+```
+
+**July dataset**
+
+```{r = loading july dataset}
+july <- read_csv("2021_07_divvy_tripdata.csv")
+```
+```{r = viewing names for july dataset}
+colnames(july)
+```
+**August dataset**
+
+```{r =loading september dataset}
+august <- read_csv("2021_08_divvy_tripdata.csv")
+```
+
+```{r = viewing column names for august dataset}
+colnames(august)
+```
+
+**September dataset**
+
+```{r = loading september dataset}
+september <- read_csv("2021_09_divvy_tripdata.csv")
+```
+
+```{r = viewing columns for september dataset}
+colnames(september)
+```
+
+**October dataset**
+
+```{r = loading october dataset}
+october <- read_csv("2021_10_divvy_tripdata.csv")
+```
+
+```{r}
+colnames(october)
+```
+
+**November dataset**
+
+```{r = loading november dataset}
+ november <- read_csv("2021_11_divvy_tripdata.csv")
+```
+
+```{r}
+colnames(november)
+```
+**December dataset**
+
+```{r loading december dataset}
+december <- read_csv("2021_12_divvy_tripdata.csv")
+```
+
+```{r = viewing columns for december dataset}
+colnames(december)
+```
+
+As we can see, the column names are consistent across all the datasets and their datatypes are also consistent, thus we can merge them into a single data frame by merging their rows
+
+```{r = merging all the datasets}
+all_trips <- bind_rows(january, february, march, april, may, june, july, august, september, october, november, december)
+```
+Thus,in this way the data is organized
+
+**How did you verify the data integrity?**
+
+As the data which is collected is first hand, and its ROCCC (Reliable, Original, Comprehensive, Current, Cited), we can ensure its accuracy and completeness for a long term, it just requires some cleaning.
+
+**How does it help to answer you question**
+
+It has the required data which is enough to gain insights of the user type, and their riding habits, thus helping us to answer our business task properly.
+
+**Are there any problem with data**
+
+No, it just needs some cleaning and sorting, its credible and fulfills all the requirements of privacy
+
+
+# Process
+
+We will now begin the **process** phase of our dataset. First we will clean the dataset, and before cleaning we will view our dataset as a whole
+
+```{r = summary of dataset}
+head(all_trips)
+tail(all_trips)
+str(all_trips)
+summary(all_trips)
+```
+Now, we will see that ride_id is consistent throughout the dataframe, i.e is the number of characters same for every ride_id
+
+We will first store the count of the characters of every row in a varaiable
+
+```{r = check for ride id}
+no_of_char <- c(nchar(all_trips$ride_id))
+```
+Now we will view the summary of this variable, if minimum, median and maximum no of characters is same, then we can conclude that ride_id column is consistent throughout.
+
+```{r = summary of ride_id}
+summary(no_of_char)
+```
+
+Thus, it is evident that ride_id is consistent throughout.
+
+Now, we will check no of casual and member users
+
+```{r = table to check the no of casual and member rider}
+table(all_trips$member_casual)
+```
+
+
+Now we will add some new columns for future analysis work
+
+```{r = date}
+all_trips$date <- as.Date(all_trips$started_at)
+```
+
+This adds a date column in the dataset, now we will add columns for month, day, year and day_of_week
+
+```{r =  day, month, year}
+all_trips$month <- format(as.Date(all_trips$started_at), "%m")
+all_trips$day <- format(as.Date(all_trips$started_at), "%d")
+all_trips$year <- format(as.Date(all_trips$started_at), "%Y")
+all_trips$day_of_week <- format(as.Date(all_trips$started_at), "%A")
+```
+
+Now, we will find the duration of each ride
+
+```{r = ride_length}
+all_trips$ride_length <- difftime(all_trips$ended_at, all_trips$started_at)
+```
+
+Moving forward, we can notice that there are ride_length which are negative, we dont want these values, also we only need selected columns for our job.
+
+```{r = filtering the negative values and selecting only the required columns }
+all_trips_v02 <- all_trips %>% select(-start_station_name, -start_station_id, -end_station_name,-end_station_id) %>% filter(ride_length>0)
+```
+This gives us all the values which are positive and only the required fields we need to work with.
+
+Now, we will check if the ride_length field is numeric or not, so that we can  go ahead with our calculations.
+
+```{r = checking ride_length type}
+is.numeric(all_trips_v02$ride_length)
+```
+
+As we can see the result obtained is **FALSE**, thus we need to convert it to numeric. In this way we can convert it to numeric format
+
+```{r = converting ride_length into numeric format}
+all_trips_v02$ride_length <- as.numeric(as.character(all_trips_v02$ride_length))
+is.numeric(all_trips_v02$ride_length) 
+```
+One thing we missed earlier was to check whether ride_length was less than a day i.e 86400 secs
+so we will remove all those columns 
+
+```{r = removing values greater than 86400 secs}
+all_trips_v03 <- all_trips_v02 %>% filter(ride_length< 86400)
+```
+
+We also notice that there are some null values and we need to remove them.
+
+```{r = removing null values}
+all_trips_v03 <- drop_na(all_trips_v03)
+```
+Thus, our cleaning process comes to an end. This also marks the end of our **PROCESS** stage
+
+# Analyze
+
+Now, we will analyze data on the basis of ride_length, day_of_week and month.
+First we will see no of rides done on each day of the week
+
+```{r = rides on each day of the week}
+table(all_trips_v03$day_of_week)
+```
+But as it can be seen, its not ordered properly in sequence of the days, so we will have to make that arrangement first.
+
+```{r = ordering according to days of the week}
+all_trips_v03$day_of_week <- ordered(all_trips_v03$day_of_week, levels = c('Monday' , 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'))
+all_trips_v03 %>% group_by(member_casual, day_of_week) %>% summarise(number_of_ride = n(), .groups = 'drop') %>% arrange(day_of_week) %>% print(n=14)
+```
+
+Thus,in this way we got some insights on the users about how they use their rides on respective days based on their subscription
+
+**It is clearly evident that users tend to use more bicycles on weekends, especially Saturday. And here it is also evident that number of casual subscribers are more on the weekends. While on weekdays, member subscribers are more** 
+
+Now, we will dig deeper and see how rides are related according to months.
+
+```{r = rides according to the month}
+table(all_trips_v03$month)
+```
+We cant get clear picture through this, so we will organise it in a more detailed way
+
+```{r = organising according to month}
+all_trips_v03 %>% group_by(member_casual, month) %>% summarise(no_of_rides = n(), .groups = 'drop') %>% arrange(month) %>% print(n = 24) 
+```
+
+Here we got a more detailed information about no of rides according to months
+
+**By looking at the data, its evident that**
+
+* As compared to other months, rides are lesser in cold months, i.e december, january, february.
+
+* During these cold months, casual subscribers are very less as compared to member subscribers.
+
+* The rides increases gradually from the month of march.
+
+Now, we will aggregate data according to statistics
+
+```{r = statistical analysis}
+aggregate(all_trips_v03$ride_length ~ all_trips_v03$member_casual + all_trips_v03$day_of_week, FUN = mean)
+```
+**Here its clearly evident that** 
+
+* mean of ride_length is more on weekends.
+
+* casual subscribers take longer rides as compared to member subscribers
+
+
+```{r = bike type}
+all_trips_v03 %>% group_by(member_casual,rideable_type) %>% summarise(num_of_rides = n(), .groups = 'drop')
+```
+
+**Here its can be clearly seen that both, member and casual subsribers preferred classic bikes**
+
+# Share
+
+The insights of the above analysis are shared here.
+
+```{r = graph 1}
+all_trips_v03 %>% group_by(member_casual, day_of_week) %>% summarise(num_of_rides = n(), .groups = 'drop') %>% ggplot() + geom_bar(mapping = aes(x= day_of_week, y= num_of_rides, fill = member_casual), position = "dodge", stat = "identity") +labs(tag = 1, title = "No of rides of two types of subscribers across days of the week.", subtitle = "From Jan 2021 to Dec 2021")
+```
+
+The graphs states that 
+
+* No of **Casual** subscriber rides increases on weekends i.e upto 72% as compared to weekdays.
+
+* The **Member** subscribers stay consistent across weekdays but a slight dip can be seen on weekends i.e of about 27%
+
+* **Member** subscribers dominate **Casual** subscribers on weekdays, whereas **Casual** subscribers dominate the former on weekends.
+
+```{r = graph 2}
+all_trips_v03 %>% group_by(member_casual, month) %>% summarise(no_of_rides = n(), .groups = 'drop') %>% ggplot() + geom_bar(mapping = aes(x = month, y = no_of_rides, fill = member_casual), position = "dodge", stat = "identity") + labs(tag = "2", title = "No of rides of two types of subscribers across year", subtitle = "From Jan 2021 to Dec 2021")
+```
+
+Insights from the graph
+
+* A steep increment in no of rides is seen from Jan to August of about 400%.
+
+* Maximum number of rides occurred in the span of 4 months, i.e June to September for both subscribers.
+
+* Casual riders dominated member riders in three months i.e June, July and August.
+
+* Casual rides were **lower** in the months of **November**, **December** and **March**, and lowest in **January** and **February**
+
+```{r = graph 3}
+all_trips_v03 %>% group_by(member_casual) %>% summarise(mean_of_ride_length = mean(ride_length)) %>% ggplot() + geom_bar(mapping = aes(x= member_casual, y = mean_of_ride_length,fill =member_casual), position = "dodge", stat = "identity") + labs(tag = 3, title = "Mean ride time for two types of subscribers", subtitle = "From Jan 2021 to Dec 2021")
+```
+
+Insights from the graph
+
+* Casual subscribers have mean ride time which is much greater than member subscribers(about 100%).
+
+```{r = graph 4}
+all_trips_v03 %>% group_by(member_casual, day_of_week) %>% summarise(mean_of_ride_length = mean(ride_length),.groups = 'drop') %>% ggplot() + geom_bar(mapping = aes(x = day_of_week, y = mean_of_ride_length, fill = member_casual), position = "dodge", stat = "identity") + labs(tag = "4", title ="Mean of ride time of two types subscribers across days", subtitle = "From Jan 2021 to Dec 2021" )
+```
+
+Insights from the graph
+
+* **Casual** subscribers use bicycles for **more time** as compared to **member** subscribers throughout the week
+
+* For **casual** subscribers, a **gradual drop** is seen from Monday to Thursday(of 18%) and then a **gradual rise** is seen from Thursday to Friday( of 35 %).
+
+* For **member** subscribers, it stays **consistent** across weekdays but a small **increment** is seen on weekends(of about 3%)
+
+* For both the subscribers, ride time is maximum on weekends.
+
+```{r = graph 5}
+all_trips_v03 %>% group_by(member_casual, month) %>% summarise(mean_of_ride_length_in_sec = mean(ride_length),.groups = 'drop') %>% ggplot() + geom_bar(mapping = aes(x = month, y = mean_of_ride_length_in_sec, fill = member_casual), position = "dodge", stat = "identity") + labs(tag = "5", title = "Mean ride length of two types of subscribers across a year", subtitle = "From Jan 2021 to Dec 2021")
+```
+
+Insights from graph
+
+* Although the no of rides for **casual** subscribers is **less** for the first **4 months**, their **ride time** is much more.
+
+* On the other hand, **member** subscribers, who had **more no of rides** across these four months as compared to **casual** subscribers, have very **less mean time** as compared to **casual** subscribers.
+
+* Member subscribers ride time stays consistent across the year, only slight dip can be seen in the year end.
+
+```{r = graph 6}
+all_trips_v03 %>% group_by(member_casual,rideable_type) %>% summarise(no_of_rides = n(), .groups = 'drop') %>% ggplot() + geom_bar(mapping = aes(x = rideable_type, y = no_of_rides, fill = member_casual), position = "dodge", stat = "identity") + labs(tag = "6", title = "Types of bike used by both the subscribers", subtitle = "From Jan 2021 to Dec 2021")
+```
+
+Insights from the graph
+
+* Both the types of subscribers prefer **classic bike**.
+
+* Second most preferred bike is the **electric bike** for both the groups.
+
+* Among all the three, least preferred is the **docked bike**.
+
+# Act
+ 
+**From the insights obtained from the above graph here are my recommendations**
+
+* As the no of rides are more during the months of June to September, a seasonal discount should be given on membership to the casual riders. This will attract more customers who will show interest in taking the membership
+
+* As the member riders are consistent across the week except weekends, they should be given weekend passes, this would encourage them to take rides on weekends, and thereby renewing their permanent membership. 
+
+* On the other hand, casual riders who are consistent on weekends should be given weekday passes, which would further enhance their chances of becoming a member subscriber.
+
+* As seen in the graph, docked bikes are least preferred bikes. So a special discount on docked bikes for member subscribers can be introduced so that their frequency of usage increases and discount can attract new customers for member subscription
+
+* A referral discount can also be given to the member subscriber if that person brings a customer for member subscription, and additional discount can be given if that customer is already a casual rider.
+
+* All this has to be done while keeping the budget in mind.
